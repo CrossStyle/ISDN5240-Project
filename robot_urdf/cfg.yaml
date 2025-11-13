@@ -1,0 +1,74 @@
+robot_cfg:
+  kinematics:
+    use_usd_kinematics: False
+    isaac_usd_path: null
+    usd_path: null
+    usd_robot_root: null
+    usd_flip_joints: null
+    usd_flip_joint_limits: []
+    urdf_path: "robot_spherized.urdf"
+    asset_root_path: ""
+    base_link: "robot"
+    ee_link: "gripper_tcp"
+    collision_link_names: [
+    "robot_kuka_arm_link_1_kuka_arm_link_1",
+    "kuka_arm_link_2",
+    "kuka_arm_link_3",
+    "kuka_arm_link_4",
+    "kuka_arm_link_5",
+    "kuka_arm_link_6",
+    "gripper_link",
+    "left_gripper_finger_link",
+    "right_gripper_finger_link",
+    "attached_object"
+    ]
+    collision_spheres: "robot_spherized.yml"
+    collision_sphere_buffer: 0.0 # 0.0025
+    extra_collision_spheres: {"attached_object": 50}
+    use_global_cumul: True
+    self_collision_ignore: {
+    "robot_kuka_arm_link_1_kuka_arm_link_1": ["kuka_arm_link_2", "kuka_arm_link_3"],
+    "kuka_arm_link_2": ["kuka_arm_link_3", "kuka_arm_link_4"],
+    "kuka_arm_link_3": ["kuka_arm_link_4", "kuka_arm_link_5"],
+    "kuka_arm_link_4": ["kuka_arm_link_5", "kuka_arm_link_6"],
+    "kuka_arm_link_5": ["kuka_arm_link_6", "gripper_link"],
+    "kuka_arm_link_6": ["gripper_link", "left_gripper_finger_link", "right_gripper_finger_link", "attached_object"],
+    "gripper_link": ["left_gripper_finger_link", "right_gripper_finger_link", "attached_object"],
+    "left_gripper_finger_link": ["right_gripper_finger_link", "attached_object"],
+    "right_gripper_finger_link": ["attached_object"]
+    }
+    self_collision_buffer: {
+    "robot_kuka_arm_link_1_kuka_arm_link_1": 0.1,
+    "kuka_arm_link_2": 0.05,
+    "kuka_arm_link_3": 0.0,
+    "kuka_arm_link_4": 0.0,
+    "kuka_arm_link_5": 0.0,
+    "kuka_arm_link_6": 0.0,
+    "gripper_link": 0.02,
+    "left_gripper_finger_link": 0.01,
+    "right_gripper_finger_link": 0.01,
+    "attached_object": 0.0
+    }
+    #link_names: []
+    mesh_link_names: [
+    "robot_kuka_arm_link_1_kuka_arm_link_1",
+    "kuka_arm_link_2",
+    "kuka_arm_link_3",
+    "kuka_arm_link_4",
+    "kuka_arm_link_5",
+    "kuka_arm_link_6",
+    "gripper_link",
+    "left_gripper_finger_link",
+    "right_gripper_finger_link"
+    ]
+    lock_joints: {"left_gripper_finger_joint": 0.04, "right_gripper_finger_joint": 0.04}
+    extra_links: {"attached_object":{"parent_link_name": "gripper_tcp" , "link_name": "attached_object", "fixed_transform": [0,0,0,1,0,0,0], "joint_type":"FIXED", "joint_name": "attach_joint" }}
+    cspace:
+    joint_names: ["joint_1","joint_2","joint_3","joint_4", "joint_5", "joint_6","left_gripper_finger_joint", "right_gripper_finger_joint"]
+    retract_config: [0.0, 0.0, 0.0, -1.57, 0.0, 1.57, 0.04, 0.04] # Typical KUKA retract pose (adjusted)
+    null_space_weight: [1,1,1,1,1,1,1,1]
+    velocity_scale: [0.9, 0.9, 0.9, 0.9, 0.9, 0.9, 1.0, 1.0] # Slower for arm, full for gripper
+    position_limit_clip: [0.0872, 0.0872, 0.0872, 0.0872, 0.0872, 0.0872, 0.001, 0.001] # Smaller clip for prismatic
+    cspace_distance_weight: [1,1,1,1,1,1,1,1]
+    max_acceleration: 5.0
+    max_jerk: 50.0
