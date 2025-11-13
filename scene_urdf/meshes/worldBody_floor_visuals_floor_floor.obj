@@ -1,0 +1,7 @@
+mtllib worldBody_floor_visuals_floor_floor.mtl
+v 0.0 0.0 0.0
+v 0.0 0.0 0.0
+v 0.0 0.0 0.0
+v 0.0 0.0 0.0
+usemtl material_groundplane
+f 1 2 3 4
