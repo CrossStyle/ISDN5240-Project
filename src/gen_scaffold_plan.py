@@ -114,9 +114,7 @@ def plan_scaffold(facade_geoms: List[Dict], contour_segments: List[Dict], depth:
 def generate_scaffold_xml(facade_xml_str: str,
                           gap: float = 0.2,
                           depth: float = 0.6,
-                          layer_height: float = 1,
-                          layer_z_low: list = [],
-                          layer_z_high: list = [],
+                          layer_height: float = 0.8,
                           ):
     root = ET.fromstring(facade_xml_str)
     facade_geoms = []
@@ -177,77 +175,78 @@ def generate_scaffold_xml(facade_xml_str: str,
         x_front = sec['x_front']
         x_back = sec['x_back']
         add_diagonal = sec['add_diagonal']
-
+        offset_0_025 =  0.025 
+        offset_0_05 =  0.05 
         # Vertical poles
         for layer in range(plan['num_layers']):
             half_length = plan['vertical_half_lengths'][layer]
             z_center = plan['z_centers'][layer]
             # 0 
-            from_p = [x_back, y_start, z_center - half_length +0.025]
-            to_p = [x_back, y_start, z_center + half_length -0.025]
+            from_p = [x_back, y_start, z_center - half_length +offset_0_025]
+            to_p = [x_back, y_start, z_center + half_length -offset_0_025]
             xml += f'        <geom name="tube{tube_id}" type="cylinder" fromto="{from_p[0]:.3f} {from_p[1]:.3f} {from_p[2]:.3f} {to_p[0]:.3f} {to_p[1]:.3f} {to_p[2]:.3f}" size="{tube_radius}" rgba="{rgba}" material="{material}"/>\n'
             tube_info[tube_id] = {"from_p": from_p, "to_p": to_p}
             tube_id += 1
 
             # 1
-            from_p = [x_back, y_end, z_center - half_length+0.025]
-            to_p = [x_back, y_end, z_center + half_length -0.025]
+            from_p = [x_back, y_end, z_center - half_length+offset_0_025]
+            to_p = [x_back, y_end, z_center + half_length -offset_0_025]
             xml += f'        <geom name="tube{tube_id}" type="cylinder" fromto="{from_p[0]:.3f} {from_p[1]:.3f} {from_p[2]:.3f} {to_p[0]:.3f} {to_p[1]:.3f} {to_p[2]:.3f}" size="{tube_radius}" rgba="{rgba}" material="{material}"/>\n'
             tube_info[tube_id] = {"from_p": from_p, "to_p": to_p}
             tube_id += 1
 
             # 2 
-            from_p = [x_back, y_end -0.05 , z_center + half_length -0.05 ]
-            to_p = [x_back, y_start +0.05 ,z_center - half_length  +0.05 ]
+            from_p = [x_back, y_end -offset_0_05 , z_center + half_length -offset_0_05 ]
+            to_p = [x_back, y_start +offset_0_05 ,z_center - half_length  +offset_0_05 ]
             xml += f'        <geom name="tube{tube_id}" type="cylinder" fromto="{from_p[0]:.3f} {from_p[1]:.3f} {from_p[2]:.3f} {to_p[0]:.3f} {to_p[1]:.3f} {to_p[2]:.2f}" size="{tube_radius}" rgba="{rgba}" material="{material}"/>\n'
             tube_info[tube_id] = {"from_p": from_p, "to_p": to_p}
             tube_id += 1
 
             # 3
-            from_p = [x_back, y_end -0.025 , z_center + half_length ]
-            to_p = [x_back, y_start +0.025 ,z_center + half_length ]
+            from_p = [x_back, y_end -offset_0_025 , z_center + half_length ]
+            to_p = [x_back, y_start +offset_0_025 ,z_center + half_length ]
             xml += f'        <geom name="tube{tube_id}" type="cylinder" fromto="{from_p[0]:.3f} {from_p[1]:.3f} {from_p[2]:.3f} {to_p[0]:.3f} {to_p[1]:.3f} {to_p[2]:.2f}" size="{tube_radius}" rgba="{rgba}" material="{material}"/>\n'
             tube_info[tube_id] = {"from_p": from_p, "to_p": to_p}
             tube_id += 1
 
             # 4
-            from_p = [x_back-0.025, y_end , z_center + half_length ]
-            to_p = [x_front+0.025, y_end ,z_center + half_length ]
+            from_p = [x_back-offset_0_025, y_end , z_center + half_length ]
+            to_p = [x_front+offset_0_025, y_end ,z_center + half_length ]
             xml += f'        <geom name="tube{tube_id}" type="cylinder" fromto="{from_p[0]:.3f} {from_p[1]:.3f} {from_p[2]:.3f} {to_p[0]:.3f} {to_p[1]:.3f} {to_p[2]:.2f}" size="{tube_radius}" rgba="{rgba}" material="{material}"/>\n'
             tube_info[tube_id] = {"from_p": from_p, "to_p": to_p}
             tube_id += 1
 
             # 5
-            from_p = [x_back-0.025, y_start , z_center + half_length ]
-            to_p = [x_front+0.025, y_start ,z_center + half_length ]
+            from_p = [x_back-offset_0_025, y_start , z_center + half_length ]
+            to_p = [x_front+offset_0_025, y_start ,z_center + half_length ]
             xml += f'        <geom name="tube{tube_id}" type="cylinder" fromto="{from_p[0]:.3f} {from_p[1]:.3f} {from_p[2]:.3f} {to_p[0]:.3f} {to_p[1]:.3f} {to_p[2]:.2f}" size="{tube_radius}" rgba="{rgba}" material="{material}"/>\n'
             tube_info[tube_id] = {"from_p": from_p, "to_p": to_p}
             tube_id += 1
 
             # 6
-            from_p = [x_front, y_end , z_center - half_length +0.025]
-            to_p = [x_front, y_end ,z_center + half_length  -0.025]
+            from_p = [x_front, y_end , z_center - half_length +offset_0_025]
+            to_p = [x_front, y_end ,z_center + half_length  -offset_0_025]
             xml += f'        <geom name="tube{tube_id}" type="cylinder" fromto="{from_p[0]:.3f} {from_p[1]:.3f} {from_p[2]:.3f} {to_p[0]:.3f} {to_p[1]:.3f} {to_p[2]:.2f}" size="{tube_radius}" rgba="{rgba}" material="{material}"/>\n'
             tube_info[tube_id] = {"from_p": from_p, "to_p": to_p}
             tube_id += 1
 
             # 7
-            from_p = [x_front, y_start , z_center - half_length +0.025]
-            to_p = [x_front, y_start ,z_center + half_length  -0.025]
+            from_p = [x_front, y_start , z_center - half_length +offset_0_025]
+            to_p = [x_front, y_start ,z_center + half_length  -offset_0_025]
             xml += f'        <geom name="tube{tube_id}" type="cylinder" fromto="{from_p[0]:.3f} {from_p[1]:.3f} {from_p[2]:.3f} {to_p[0]:.3f} {to_p[1]:.3f} {to_p[2]:.2f}" size="{tube_radius}" rgba="{rgba}" material="{material}"/>\n'
             tube_info[tube_id] = {"from_p": from_p, "to_p": to_p}
             tube_id += 1
 
             # 8
-            from_p = [x_front, y_end -0.05 , z_center - half_length +0.05 ]
-            to_p = [x_front, y_start +0.05 ,z_center + half_length  -0.05 ]
+            from_p = [x_front, y_end -offset_0_05 , z_center - half_length +offset_0_05 ]
+            to_p = [x_front, y_start +offset_0_05 ,z_center + half_length  -offset_0_05 ]
             xml += f'        <geom name="tube{tube_id}" type="cylinder" fromto="{from_p[0]:.3f} {from_p[1]:.3f} {from_p[2]:.3f} {to_p[0]:.3f} {to_p[1]:.3f} {to_p[2]:.2f}" size="{tube_radius}" rgba="{rgba}" material="{material}"/>\n'
             tube_info[tube_id] = {"from_p": from_p, "to_p": to_p}
             tube_id += 1
 
             # 9
-            from_p = [x_front, y_end -0.025 , z_center + half_length ]
-            to_p = [x_front, y_start +0.025 ,z_center + half_length ]
+            from_p = [x_front, y_end -offset_0_025 , z_center + half_length ]
+            to_p = [x_front, y_start +offset_0_025 ,z_center + half_length ]
             xml += f'        <geom name="tube{tube_id}" type="cylinder" fromto="{from_p[0]:.3f} {from_p[1]:.3f} {from_p[2]:.3f} {to_p[0]:.3f} {to_p[1]:.3f} {to_p[2]:.2f}" size="{tube_radius}" rgba="{rgba}" material="{material}"/>\n'
             tube_info[tube_id] = {"from_p": from_p, "to_p": to_p}
             tube_id += 1
@@ -302,20 +301,15 @@ def generate_scaffold_xml(facade_xml_str: str,
 # get different designs by setting different wall, col1, and col2 locations
 facade_xml = '''
 <worldbody>
-    <geom name="wall" type="box" size="2.5 0.025 3" pos="3.2 0 0" euler="0 0 1.57" rgba="0.8 0.6 0.4 1" material="wood_mat"/>
-    <geom name="col1" type="cylinder" size="0.5 1.5" pos="3.2 -1 1.5" euler="0 0 1.57" rgba="0.8 0.6 0.4 1" material="wood_mat"/>
-    <geom name="col2" type="cylinder" size="0.5 1.5" pos="3.2 1 1.5" euler="0 0 1.57" rgba="0.8 0.6 0.4 1" material="wood_mat"/>
+    <geom name="wall" type="box" size="2.0 0.025 2.4" pos="3.2 0 0" euler="0 0 1.57" rgba="0.8 0.6 0.4 1" material="wood_mat"/>
+    <geom name="col1" type="cylinder" size="0.4 1.2" pos="3.2 -0.8 1.2" euler="0 0 1.57" rgba="0.8 0.6 0.4 1" material="wood_mat"/>
+    <geom name="col2" type="cylinder" size="0.4 1.2" pos="3.2 0.8 1.2" euler="0 0 1.57" rgba="0.8 0.6 0.4 1" material="wood_mat"/>
 </worldbody>
 '''
-
-layer_z_low = [0., 1., 2.]
-layer_z_high = [1., 2., 3.]
 
 # scaffold_structure[id] = {"start_pos":[], "end_pos": []}
 xml, scaffold_structure = generate_scaffold_xml(
     facade_xml_str=facade_xml,
-    layer_z_low=layer_z_low,
-    layer_z_high=layer_z_high
 )
 
 visualize_using_mujoco = True
