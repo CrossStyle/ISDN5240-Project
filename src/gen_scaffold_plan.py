@@ -80,22 +80,34 @@ def plan_scaffold(facade_geoms: List[Dict], contour_segments: List[Dict], depth:
     vertical_half_lengths = [layer_height / 2] * num_layers
     z_centers = (horizontal_levels[:-1] + horizontal_levels[1:]) / 2
 
+
+    # ---- 重排 contour_segments ----
+    # 依 min_x 由大到小排序；Python sort 是 stable，
+    # 所以同一個 min_x 之間會保持原本的順序。
+
+    contour_segments_sorted = sorted(
+        contour_segments,
+        key=lambda seg: seg["min_x"],
+        reverse=True
+    )
+
+
     sections = []
-    for seg in contour_segments:
+    for seg in contour_segments_sorted:
         sections.append({
             'y_start': seg['y_min'],
             'y_end': seg['y_max'],
             'x_front': seg['min_x'] - depth,
             'x_back': seg['min_x'],
-            'add_diagonal': (seg['y_max'] - seg['y_min'] > 0.5),
+            'add_diagonal': (seg['y_max'] - seg['y_min'] > 0.5), # only give true and false
         })
 
     return {
         'sections': sections,
-        'num_layers': num_layers,
-        'horizontal_levels': horizontal_levels,
-        'vertical_half_lengths': vertical_half_lengths,
-        'z_centers': z_centers
+        'num_layers': num_layers,                       # order of the layers
+        'horizontal_levels': horizontal_levels,         # order of the layers
+        'vertical_half_lengths': vertical_half_lengths, # order of the layers
+        'z_centers': z_centers                          # order of the layers
     }
 
 
@@ -121,13 +133,14 @@ def generate_scaffold_xml(facade_xml_str: str,
     plan = plan_scaffold(facade_geoms, contour_segments, depth, layer_height)
 
     # --- 2) 在這裡插入 GridPathPlanner：取得 sequence 並印出 ---
-    planner = GridPathPlanner(1.0, contour_segments, plan["num_layers"])
+    # planner = GridPathPlanner(1.0, contour_segments, plan["num_layers"])
+    # pos_sequences = planner.build_sequences_pos
+    # 例如印第一個 segment 的所有 from/to
+    # for i, (p_from, p_to) in enumerate(pos_sequences[0]):
+    #     print(f"step {i}: from {p_from} to {p_to}")
 
 
-
-
-
-    planner.print_info()  # 這裡會印出 sorted segments 和每個 (layer, seg) 的 steps
+    # planner.print_info()  # 這裡會印出 sorted segments 和每個 (layer, seg) 的 steps
 
     tube_radius = 0.024
     rgba = "0.7 0.7 0.7 1"
@@ -169,47 +182,118 @@ def generate_scaffold_xml(facade_xml_str: str,
         for layer in range(plan['num_layers']):
             half_length = plan['vertical_half_lengths'][layer]
             z_center = plan['z_centers'][layer]
-            for x, y in [(x_front, y_start), (x_front, y_end), (x_back, y_start), (x_back, y_end)]:
-                from_p = [x, y, z_center - half_length]
-                to_p = [x, y, z_center + half_length]
-                xml += f'        <geom name="tube{tube_id}" type="cylinder" fromto="{from_p[0]:.1f} {from_p[1]:.1f} {from_p[2]:.1f} {to_p[0]:.1f} {to_p[1]:.1f} {to_p[2]:.1f}" size="{tube_radius}" rgba="{rgba}" material="{material}"/>\n'
-                tube_info[tube_id] = {"from_p": from_p, "to_p": to_p}
-                tube_id += 1
+            # 0 
+            from_p = [x_back, y_start, z_center - half_length +0.025]
+            to_p = [x_back, y_start, z_center + half_length -0.025]
+            xml += f'        <geom name="tube{tube_id}" type="cylinder" fromto="{from_p[0]:.3f} {from_p[1]:.3f} {from_p[2]:.3f} {to_p[0]:.3f} {to_p[1]:.3f} {to_p[2]:.3f}" size="{tube_radius}" rgba="{rgba}" material="{material}"/>\n'
+            tube_info[tube_id] = {"from_p": from_p, "to_p": to_p}
+            tube_id += 1
 
-        # x向横杆 (along x)
-        for z in plan['horizontal_levels']:
-            for y in [y_start, y_end]:
-                from_p = [x_front, y, z]
-                to_p = [x_back, y, z]
-                xml += f'        <geom name="tube{tube_id}" type="cylinder" fromto="{from_p[0]:.1f} {from_p[1]:.1f} {from_p[2]:.1f} {to_p[0]:.1f} {to_p[1]:.1f} {to_p[2]:.1f}" size="{tube_radius}" rgba="{rgba}" material="{material}"/>\n'
-                tube_info[tube_id] = {"from_p": from_p, "to_p": to_p}
-                tube_id += 1
+            # 1
+            from_p = [x_back, y_end, z_center - half_length+0.025]
+            to_p = [x_back, y_end, z_center + half_length -0.025]
+            xml += f'        <geom name="tube{tube_id}" type="cylinder" fromto="{from_p[0]:.3f} {from_p[1]:.3f} {from_p[2]:.3f} {to_p[0]:.3f} {to_p[1]:.3f} {to_p[2]:.3f}" size="{tube_radius}" rgba="{rgba}" material="{material}"/>\n'
+            tube_info[tube_id] = {"from_p": from_p, "to_p": to_p}
+            tube_id += 1
 
-        # y向横杆 (along y)
-        for z in plan['horizontal_levels']:
-            for x in [x_front, x_back]:
-                from_p = [x, y_start, z]
-                to_p = [x, y_end, z]
-                xml += f'        <geom name="tube{tube_id}" type="cylinder" fromto="{from_p[0]:.1f} {from_p[1]:.1f} {from_p[2]:.1f} {to_p[0]:.1f} {to_p[1]:.1f} {to_p[2]:.1f}" size="{tube_radius}" rgba="{rgba}" material="{material}"/>\n'
-                tube_info[tube_id] = {"from_p": from_p, "to_p": to_p}
-                tube_id += 1
+            # 2 
+            from_p = [x_back, y_end -0.05 , z_center + half_length -0.05 ]
+            to_p = [x_back, y_start +0.05 ,z_center - half_length  +0.05 ]
+            xml += f'        <geom name="tube{tube_id}" type="cylinder" fromto="{from_p[0]:.3f} {from_p[1]:.3f} {from_p[2]:.3f} {to_p[0]:.3f} {to_p[1]:.3f} {to_p[2]:.2f}" size="{tube_radius}" rgba="{rgba}" material="{material}"/>\n'
+            tube_info[tube_id] = {"from_p": from_p, "to_p": to_p}
+            tube_id += 1
 
-        # 斜杆
-        if add_diagonal:
-            for layer in range(plan['num_layers']):
-                z_low = layer_z_low[layer]
-                z_high = layer_z_high[layer]
-                for x in [x_front, x_back]:
-                    from_p = [x, y_start, z_low]
-                    to_p = [x, y_end, z_high]
-                    xml += f'        <geom name="tube{tube_id}" type="cylinder" fromto="{from_p[0]:.1f} {from_p[1]:.1f} {from_p[2]:.1f} {to_p[0]:.1f} {to_p[1]:.1f} {to_p[2]:.1f}" size="{tube_radius}" rgba="{rgba}" material="{material}"/>\n'
-                    tube_info[tube_id] = {"from_p": from_p, "to_p": to_p}
-                    tube_id += 1
-                    from_p = [x, y_end, z_low]
-                    to_p = [x, y_start, z_high]
-                    xml += f'        <geom name="tube{tube_id}" type="cylinder" fromto="{from_p[0]:.1f} {from_p[1]:.1f} {from_p[2]:.1f} {to_p[0]:.1f} {to_p[1]:.1f} {to_p[2]:.1f}" size="{tube_radius}" rgba="{rgba}" material="{material}"/>\n'
-                    tube_info[tube_id] = {"from_p": from_p, "to_p": to_p}
-                    tube_id += 1
+            # 3
+            from_p = [x_back, y_end -0.025 , z_center + half_length ]
+            to_p = [x_back, y_start +0.025 ,z_center + half_length ]
+            xml += f'        <geom name="tube{tube_id}" type="cylinder" fromto="{from_p[0]:.3f} {from_p[1]:.3f} {from_p[2]:.3f} {to_p[0]:.3f} {to_p[1]:.3f} {to_p[2]:.2f}" size="{tube_radius}" rgba="{rgba}" material="{material}"/>\n'
+            tube_info[tube_id] = {"from_p": from_p, "to_p": to_p}
+            tube_id += 1
+
+            # 4
+            from_p = [x_back-0.025, y_end , z_center + half_length ]
+            to_p = [x_front+0.025, y_end ,z_center + half_length ]
+            xml += f'        <geom name="tube{tube_id}" type="cylinder" fromto="{from_p[0]:.3f} {from_p[1]:.3f} {from_p[2]:.3f} {to_p[0]:.3f} {to_p[1]:.3f} {to_p[2]:.2f}" size="{tube_radius}" rgba="{rgba}" material="{material}"/>\n'
+            tube_info[tube_id] = {"from_p": from_p, "to_p": to_p}
+            tube_id += 1
+
+            # 5
+            from_p = [x_back-0.025, y_start , z_center + half_length ]
+            to_p = [x_front+0.025, y_start ,z_center + half_length ]
+            xml += f'        <geom name="tube{tube_id}" type="cylinder" fromto="{from_p[0]:.3f} {from_p[1]:.3f} {from_p[2]:.3f} {to_p[0]:.3f} {to_p[1]:.3f} {to_p[2]:.2f}" size="{tube_radius}" rgba="{rgba}" material="{material}"/>\n'
+            tube_info[tube_id] = {"from_p": from_p, "to_p": to_p}
+            tube_id += 1
+
+            # 6
+            from_p = [x_front, y_end , z_center - half_length +0.025]
+            to_p = [x_front, y_end ,z_center + half_length  -0.025]
+            xml += f'        <geom name="tube{tube_id}" type="cylinder" fromto="{from_p[0]:.3f} {from_p[1]:.3f} {from_p[2]:.3f} {to_p[0]:.3f} {to_p[1]:.3f} {to_p[2]:.2f}" size="{tube_radius}" rgba="{rgba}" material="{material}"/>\n'
+            tube_info[tube_id] = {"from_p": from_p, "to_p": to_p}
+            tube_id += 1
+
+            # 7
+            from_p = [x_front, y_start , z_center - half_length +0.025]
+            to_p = [x_front, y_start ,z_center + half_length  -0.025]
+            xml += f'        <geom name="tube{tube_id}" type="cylinder" fromto="{from_p[0]:.3f} {from_p[1]:.3f} {from_p[2]:.3f} {to_p[0]:.3f} {to_p[1]:.3f} {to_p[2]:.2f}" size="{tube_radius}" rgba="{rgba}" material="{material}"/>\n'
+            tube_info[tube_id] = {"from_p": from_p, "to_p": to_p}
+            tube_id += 1
+
+            # 8
+            from_p = [x_front, y_end -0.05 , z_center - half_length +0.05 ]
+            to_p = [x_front, y_start +0.05 ,z_center + half_length  -0.05 ]
+            xml += f'        <geom name="tube{tube_id}" type="cylinder" fromto="{from_p[0]:.3f} {from_p[1]:.3f} {from_p[2]:.3f} {to_p[0]:.3f} {to_p[1]:.3f} {to_p[2]:.2f}" size="{tube_radius}" rgba="{rgba}" material="{material}"/>\n'
+            tube_info[tube_id] = {"from_p": from_p, "to_p": to_p}
+            tube_id += 1
+
+            # 9
+            from_p = [x_front, y_end -0.025 , z_center + half_length ]
+            to_p = [x_front, y_start +0.025 ,z_center + half_length ]
+            xml += f'        <geom name="tube{tube_id}" type="cylinder" fromto="{from_p[0]:.3f} {from_p[1]:.3f} {from_p[2]:.3f} {to_p[0]:.3f} {to_p[1]:.3f} {to_p[2]:.2f}" size="{tube_radius}" rgba="{rgba}" material="{material}"/>\n'
+            tube_info[tube_id] = {"from_p": from_p, "to_p": to_p}
+            tube_id += 1
+
+    # key: (x1,y1,z1,x2,y2,z2)（端點排序後、四捨五入），value: [tube_id1, tube_id2, ...]
+    segment_dict = {}
+
+    for tid, seg in tube_info.items():
+        p1 = np.array(seg["from_p"], dtype=float)
+        p2 = np.array(seg["to_p"], dtype=float)
+
+        # 忽略方向：把端點按座標字典序排序，A→B 和 B→A 都變成同一個 key
+        if tuple(p1) <= tuple(p2):
+            a, b = p1, p2
+        else:
+            a, b = p2, p1
+
+        # 四捨五入，避免 0.3000000004 之類的浮點數誤差
+        key = tuple(np.round(np.concatenate([a, b]), 3))
+
+        if key not in segment_dict:
+            segment_dict[key] = []
+        segment_dict[key].append(tid)
+
+    overlapped_tube_ids = []
+    valid_tube_ids_set = set()
+
+    for key, ids in segment_dict.items():
+        ids_sorted = sorted(ids)
+        # 只要這個幾何 segment 出現超過一次，就視為重疊群組
+        if len(ids_sorted) > 1:
+            overlapped_tube_ids.extend(ids_sorted)
+        # 無論有沒有重疊，這組裡「最小的 id」保留
+        valid_tube_ids_set.add(ids_sorted[0])
+
+    # 排序一下方便看
+    overlapped_tube_ids = sorted(set(overlapped_tube_ids))
+    valid_tube_index = sorted(valid_tube_ids_set)
+
+    # 實際被丟掉的那幾根（重疊群組裡除了第一根以外）
+    removed_tube_ids = sorted(set(overlapped_tube_ids) - valid_tube_ids_set)
+
+    # print("Overlapped tube indices (all in overlapping groups):", overlapped_tube_ids)
+    # print("Removed overlapped tube indices (discarded):", removed_tube_ids)
+    print("Valid tube indices (kept):", valid_tube_index)
+
 
     xml += '    </worldbody>\n</mujoco>\n'
     return xml, tube_info
@@ -218,7 +302,7 @@ def generate_scaffold_xml(facade_xml_str: str,
 # get different designs by setting different wall, col1, and col2 locations
 facade_xml = '''
 <worldbody>
-    <geom name="wall" type="box" size="3.5 0.025 3" pos="3.2 0 0" euler="0 0 1.57" rgba="0.8 0.6 0.4 1" material="wood_mat"/>
+    <geom name="wall" type="box" size="2.5 0.025 3" pos="3.2 0 0" euler="0 0 1.57" rgba="0.8 0.6 0.4 1" material="wood_mat"/>
     <geom name="col1" type="cylinder" size="0.5 1.5" pos="3.2 -1 1.5" euler="0 0 1.57" rgba="0.8 0.6 0.4 1" material="wood_mat"/>
     <geom name="col2" type="cylinder" size="0.5 1.5" pos="3.2 1 1.5" euler="0 0 1.57" rgba="0.8 0.6 0.4 1" material="wood_mat"/>
 </worldbody>
