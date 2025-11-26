@@ -1,0 +1,342 @@
+<?xml version="1.0" encoding="utf-8"?>
+<robot name="robot">
+    <joint name="joint_1" type="revolute">
+        <origin xyz="0. 0. 0.33" rpy="0. -1.5707964 0. "/>
+        <parent link="robot"/>
+        <child link="robot_kuka_arm_link_1_kuka_arm_link_1"/>
+        <axis xyz="1. 0. 0."/>
+        <limit lower="-3.2288596" upper="3.2288596" effort="0." velocity="17453.2925199"/>
+    </joint>
+    <joint name="joint_2" type="revolute">
+        <origin xyz="0.42 0. -0.35" rpy="1.5707964 0. 1.5707964"/>
+        <parent link="robot_kuka_arm_link_1_kuka_arm_link_1"/>
+        <child link="kuka_arm_link_2"/>
+        <axis xyz="1. 0. 0."/>
+        <limit lower="-0.785398" upper="1.48353" effort="0." velocity="17453.2925199"/>
+    </joint>
+    <joint name="joint_3" type="revolute">
+        <origin xyz="0. 0. 1.25" rpy="0. 0. 0."/>
+        <parent link="kuka_arm_link_2"/>
+        <child link="kuka_arm_link_3"/>
+        <axis xyz="1. 0. 0."/>
+        <limit lower="-3.6651898" upper="1.1344599" effort="0." velocity="17453.2925199"/>
+    </joint>
+    <joint name="joint_4" type="revolute">
+        <origin xyz="0. -0.9599999 -0.054 " rpy="0. 0. -1.5707964"/>
+        <parent link="kuka_arm_link_3"/>
+        <child link="kuka_arm_link_4"/>
+        <axis xyz="1. 0. 0."/>
+        <limit lower="-6.1086497" upper="6.1086497" effort="0." velocity="17453.2925199"/>
+    </joint>
+    <joint name="joint_5" type="revolute">
+        <origin xyz="0.54 0. 0. " rpy="0. 0. 1.5707964"/>
+        <parent link="kuka_arm_link_4"/>
+        <child link="kuka_arm_link_5"/>
+        <axis xyz="1. 0. 0."/>
+        <limit lower="-2.1816598" upper="2.1816598" effort="0." velocity="17453.2925199"/>
+    </joint>
+    <joint name="joint_6" type="revolute">
+        <origin xyz="0. -0.1930001 0. " rpy="0. 0. -1.5707964"/>
+        <parent link="kuka_arm_link_5"/>
+        <child link="kuka_arm_link_6"/>
+        <axis xyz="1. 0. 0."/>
+        <limit lower="-6.1086497" upper="6.1086497" effort="0." velocity="17453.2925199"/>
+    </joint>
+    <joint name="left_gripper_finger_joint" type="prismatic">
+        <origin xyz="0.26 0.0725 0. " rpy="3.1415927 0. -1.5707964"/>
+        <parent link="kuka_arm_link_6"/>
+        <child link="left_gripper_finger_link"/>
+        <axis xyz="1. 0. 0."/>
+        <limit lower="-0.01" upper="0.06" effort="0." velocity="1000000."/>
+    </joint>
+    <joint name="right_gripper_finger_joint" type="prismatic">
+        <origin xyz="0.26 -0.0725 0. " rpy="0. 0. 1.5707964"/>
+        <parent link="kuka_arm_link_6"/>
+        <child link="right_gripper_finger_link"/>
+        <axis xyz="1. 0. 0."/>
+        <limit lower="-0.01" upper="0.06" effort="0." velocity="1000000."/>
+    </joint>
+
+    <joint name="gripper_joint" type="fixed">
+        <parent link="kuka_arm_link_6"/>
+        <child link="gripper_link"/>
+        <origin rpy="1.57 0 0" xyz="0.11 0 0"/>
+        <axis xyz="0 1 0"/>
+    </joint>
+    <joint name="gripper_tcp_joint" type="fixed">
+        <origin rpy="0 0 0" xyz="0 0 0.05"/>
+        <parent link="gripper_link"/>
+        <child link="gripper_tcp"/>
+    </joint>
+
+    <link name="robot">
+        <visual>
+            <origin xyz="0. 0. 0." rpy="-0.0000091 0. 0. "/>
+            <geometry>
+                <mesh filename="meshes/worldBody___visuals___mesh.obj" scale="1. 1. 1."/>
+            </geometry>
+        </visual>
+    </link>
+    <link name="robot_kuka_arm_link_1_kuka_arm_link_1">
+        <visual>
+            <origin xyz="0. 0. 0." rpy="1.570788 1.5707964 0. "/>
+            <geometry>
+                <mesh filename="meshes/robot_kuka_arm_link_1_kuka_arm_link_1_visuals_mesh.obj" scale="1. 1. 1."/>
+            </geometry>
+        </visual>
+        <visual>
+            <origin xyz="0. 0. 0." rpy="1.570788 1.5707964 0. "/>
+            <geometry>
+                <mesh filename="meshes/robot_kuka_arm_link_1_kuka_arm_link_1_collisions_mesh.obj" scale="1. 1. 1."/>
+            </geometry>
+        </visual>
+        <collision name="sphere_23">
+            <origin xyz="0.3853171231791153 3.016968403539145e-18 -0.40294019359870453" rpy="0 0 0"/>
+            <geometry>
+                <sphere radius="0.2969944905889949"/>
+            </geometry>
+        </collision>
+        <collision name="sphere_24">
+            <origin xyz="0.3039056973264224 0.11361252012600448 0.26311786827710804" rpy="0 0 0"/>
+            <geometry>
+                <sphere radius="0.3855194494710704"/>
+            </geometry>
+        </collision>
+        <collision name="sphere_25">
+            <origin xyz="0.22964270798733716 -0.200145579561204 0.3321878437575019" rpy="0 0 0"/>
+            <geometry>
+                <sphere radius="0.33548914118220985"/>
+            </geometry>
+        </collision>
+        <collision name="sphere_26">
+            <origin xyz="0.35967081545282925 -0.27340428279409357 -0.03932870071404963" rpy="0 0 0"/>
+            <geometry>
+                <sphere radius="0.24332780241870738"/>
+            </geometry>
+        </collision>
+        <collision name="sphere_27">
+            <origin xyz="0.3497125792823665 0.1622123310040399 -0.07363408827195533" rpy="0 0 0"/>
+            <geometry>
+                <sphere radius="0.3158090818304898"/>
+            </geometry>
+        </collision>
+    </link>
+    <link name="kuka_arm_link_2">
+        <visual>
+            <origin xyz="0. 0. 0." rpy="-0.0000091 0. -1.5707964"/>
+            <geometry>
+                <mesh filename="meshes/kuka_arm_link_2_visuals_mesh.obj" scale="1. 1. 1."/>
+            </geometry>
+        </visual>
+        <collision name="sphere_0">
+            <origin xyz="-0.10056914088729499 0.0 0.0" rpy="0 0 0"/>
+            <geometry>
+                <sphere radius="0.312562771404809"/>
+            </geometry>
+        </collision>
+        <collision name="sphere_1">
+            <origin xyz="-0.20296284362704328 -5.551115123125783e-17 0.19267381739225486" rpy="0 0 0"/>
+            <geometry>
+                <sphere radius="0.2882773280117739"/>
+            </geometry>
+        </collision>
+        <collision name="sphere_2">
+            <origin xyz="-0.2688235077381462 0.0 0.5120850632241715" rpy="0 0 0"/>
+            <geometry>
+                <sphere radius="0.2599685374907719"/>
+            </geometry>
+        </collision>
+        <collision name="sphere_3">
+            <origin xyz="-0.2429457297559245 -1.6653345369377348e-16 0.7897212102688002" rpy="0 0 0"/>
+            <geometry>
+                <sphere radius="0.25693811033217645"/>
+            </geometry>
+        </collision>
+        <collision name="sphere_4">
+            <origin xyz="-0.2322697986708392 0.0 1.0466995171922129" rpy="0 0 0"/>
+            <geometry>
+                <sphere radius="0.25693811033217645"/>
+            </geometry>
+        </collision>
+        <collision name="sphere_5">
+            <origin xyz="-0.2018643112478043 -5.551115123125783e-17 1.2173413182504351" rpy="0 0 0"/>
+            <geometry>
+                <sphere radius="0.23358661898327102"/>
+            </geometry>
+        </collision>
+    </link>
+    <link name="kuka_arm_link_3">
+        <visual>
+            <origin xyz="-0.184 0. 0. " rpy="-0.0000091 0. -1.5707964"/>
+            <geometry>
+                <mesh filename="meshes/kuka_arm_link_3_visuals_mesh.obj" scale="1. 1. 1."/>
+            </geometry>
+        </visual>
+        <collision name="sphere_6">
+            <origin xyz="-1.3010518714054659e-17 0.31055029167029724 -0.03488192925599143" rpy="0 0 0"/>
+            <geometry>
+                <sphere radius="0.32892536519372145"/>
+            </geometry>
+        </collision>
+        <collision name="sphere_7">
+            <origin xyz="-0.010269733629968511 5.551115123125783e-17 0.0" rpy="0 0 0"/>
+            <geometry>
+                <sphere radius="0.37246399938456065"/>
+            </geometry>
+        </collision>
+        <collision name="sphere_8">
+            <origin xyz="-0.004899208735049537 -0.4036089099633981 -0.02669932418063703" rpy="0 0 0"/>
+            <geometry>
+                <sphere radius="0.20655031539590454"/>
+            </geometry>
+        </collision>
+        <collision name="sphere_9">
+            <origin xyz="-2.775566825985752e-17 -0.650587462939314 -0.05279828184548685" rpy="0 0 0"/>
+            <geometry>
+                <sphere radius="0.20655031539590454"/>
+            </geometry>
+        </collision>
+        <collision name="sphere_10">
+            <origin xyz="-1.3877880452043063e-17 -0.8658041427243452 -0.05263752410922362" rpy="0 0 0"/>
+            <geometry>
+                <sphere radius="0.20655031539590454"/>
+            </geometry>
+        </collision>
+    </link>
+    <link name="kuka_arm_link_4">
+        <visual>
+            <origin xyz="0. 0. 0." rpy="-0.0000091 0. 0. "/>
+            <geometry>
+                <mesh filename="meshes/kuka_arm_link_4_visuals_mesh.obj" scale="1. 1. 1."/>
+            </geometry>
+        </visual>
+        <collision name="sphere_11">
+            <origin xyz="0.047247304363761344 8.326678640389084e-17 -2.220446049250313e-16" rpy="0 0 0"/>
+            <geometry>
+                <sphere radius="0.1794211617259098"/>
+            </geometry>
+        </collision>
+        <collision name="sphere_12">
+            <origin xyz="0.3010660948523467 1.3877793763514867e-16 -4.440892098500626e-16" rpy="0 0 0"/>
+            <geometry>
+                <sphere radius="0.1794211617259098"/>
+            </geometry>
+        </collision>
+        <collision name="sphere_13">
+            <origin xyz="0.49201724313219164 2.775563517263302e-17 -2.220446049250313e-16" rpy="0 0 0"/>
+            <geometry>
+                <sphere radius="0.24607203187629179"/>
+            </geometry>
+        </collision>
+    </link>
+    <link name="kuka_arm_link_5">
+        <visual>
+            <origin xyz="0. 0.0000001 0. " rpy="-0.0000091 0. -1.5707964"/>
+            <geometry>
+                <mesh filename="meshes/kuka_arm_link_5_visuals_mesh.obj" scale="1. 1. 1."/>
+            </geometry>
+        </visual>
+        <collision name="sphere_14">
+            <origin xyz="-0.00517521934122922 -0.06717495437991183 2.220446049250313e-16" rpy="0 0 0"/>
+            <geometry>
+                <sphere radius="0.2125868474637989"/>
+            </geometry>
+        </collision>
+    </link>
+    <link name="kuka_arm_link_6">
+        <visual>
+            <origin xyz="0.0000001 0. 0. " rpy="1.570788 0. 0. "/>
+            <geometry>
+                <mesh filename="meshes/kuka_arm_link_6_visuals_mesh.obj" scale="1. 1. 1."/>
+            </geometry>
+        </visual>
+    </link>
+    <link name="gripper_link">
+        <inertial>
+            <origin rpy="0 0 0" xyz="0 0 0"/>
+            <mass value="0.3"/>
+            <inertia ixx="0.0001" ixy="0" ixz="0" iyy="0.0002" iyz="0" izz="0.0001"/>
+        </inertial>
+        <visual>
+            <origin rpy="0 0 0" xyz="0 0 0"/>
+            <geometry>
+                <mesh filename="meshes/kuka_arm_link_6_visuals_gripper_base_mesh.obj"/>
+            </geometry>
+        </visual>
+        <collision name="sphere_15">
+            <origin xyz="-0.008610050657241963 2.220446049250313e-16 5.789639601072594e-17" rpy="0 0 0"/>
+            <geometry>
+                <sphere radius="0.12986939348734478"/>
+            </geometry>
+        </collision>
+    </link>
+    <link name="left_gripper_finger_link">
+        <visual>
+            <origin xyz="0. 0. 0." rpy="-1.5708046 0. -1.5707964"/>
+            <geometry>
+                <mesh filename="meshes/left_gripper_finger_link_visuals_mesh.obj" scale="1. 1. 1."/>
+            </geometry>
+        </visual>
+        <collision name="sphere_19">
+            <origin xyz="-0.0009867102377992681 0.028810712307991704 0.0" rpy="0 0 0"/>
+            <geometry>
+                <sphere radius="0.029496874713989374"/>
+            </geometry>
+        </collision>
+        <collision name="sphere_20">
+            <origin xyz="-0.0007529923397825294 4.440892098500626e-16 -2.220446049250313e-16" rpy="0 0 0"/>
+            <geometry>
+                <sphere radius="0.029496874713989374"/>
+            </geometry>
+        </collision>
+        <collision name="sphere_21">
+            <origin xyz="-0.0014462733000717848 -0.027893947890389903 0.0" rpy="0 0 0"/>
+            <geometry>
+                <sphere radius="0.029496874713989374"/>
+            </geometry>
+        </collision>
+        <collision name="sphere_22">
+            <origin xyz="-7.881778214532259e-05 -0.06047734771457369 0.00014119311356375341" rpy="0 0 0"/>
+            <geometry>
+                <sphere radius="0.029496874713989374"/>
+            </geometry>
+        </collision>
+    </link>
+    <link name="right_gripper_finger_link">
+        <visual>
+            <origin xyz="0. 0. 0." rpy="1.570788 0. -1.5707964"/>
+            <geometry>
+                <mesh filename="meshes/right_gripper_finger_link_visuals_mesh.obj" scale="1. 1. 1."/>
+            </geometry>
+        </visual>
+        <collision name="sphere_16">
+            <origin xyz="0.005412433844058935 0.01492794005638931 4.440892098500626e-16" rpy="0 0 0"/>
+            <geometry>
+                <sphere radius="0.03133081721050732"/>
+            </geometry>
+        </collision>
+        <collision name="sphere_17">
+            <origin xyz="0.004998117508912749 -0.02704602253331334 -2.220446049250313e-16" rpy="0 0 0"/>
+            <geometry>
+                <sphere radius="0.03133081721050732"/>
+            </geometry>
+        </collision>
+        <collision name="sphere_18">
+            <origin xyz="0.0014777731542005637 -0.06054847324793933 0.0005669492960314049" rpy="0 0 0"/>
+            <geometry>
+                <sphere radius="0.03133081721050732"/>
+            </geometry>
+        </collision>
+    </link>
+    <link name="gripper_tcp">
+        <visual>
+            <origin xyz="0.15 0 -0.05" rpy="0 0 0"/>
+            <geometry>
+                <sphere radius="0.01"/>
+            </geometry>
+            <material name="red">
+                <color rgba="1 0 0 1"/>
+            </material>
+        </visual>
+    </link>
+</robot>
